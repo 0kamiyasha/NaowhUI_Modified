@@ -446,13 +446,13 @@ function NaowhUIInstaller:CreateFrame()
     end
 
     local title = header:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("LEFT", logo, "RIGHT", 12, 20) 
+    title:SetPoint("LEFT", logo, "RIGHT", 0, 21) 
     title:SetText("Installer")
-    title:SetFont("Interface\\AddOns\\NaowhUI\\Core\\Media\\Fonts\\Naowh.ttf", 48, "OUTLINE")
+    title:SetFont("Interface\\AddOns\\NaowhUI\\Core\\Media\\Fonts\\Naowh.ttf", 36)
 
     local closeBtn = _G.CreateFrame("Button", nil, header)
     closeBtn:SetSize(32, 32)
-    closeBtn:SetPoint("TOPRIGHT", header, "TOPRIGHT", -8, -8)
+    closeBtn:SetPoint("TOPRIGHT", header, "TOPRIGHT", 0, 0)
 
     closeBtn:SetNormalTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Up")
     closeBtn:SetPushedTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Down")
