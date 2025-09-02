@@ -1,0 +1,6 @@
+# Ignore all folders except NaowhUI and NaowhUI_Data
+/*
+!/NaowhUI/
+!/NaowhUI_Data/
+!.gitignore
+!README.md
