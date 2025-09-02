@@ -73,11 +73,10 @@ function NaowhUIInstaller:CreateModernButton(parent, text, width, height, button
     return btn
 end
 
--- Function to create modern styled dropdown
 function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     local dropdown = _G.CreateFrame("Frame", nil, parent, "BackdropTemplate")
     dropdown:SetSize(width or 200, height or 32)
-    
+
     dropdown:SetBackdrop({
         bgFile = "Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Background-Rock",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -88,20 +87,17 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     })
     dropdown:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
     dropdown:SetBackdropBorderColor(0, 0, 0, 0.8)
-    
-    -- Dropdown text
+
     local dropdownText = dropdown:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     dropdownText:SetPoint("LEFT", dropdown, "LEFT", 10, 0)
     dropdownText:SetText("Select an option...")
     dropdownText:SetTextColor(0.9, 0.9, 0.9, 1)
-    
-    -- Dropdown arrow
+
     local arrow = dropdown:CreateTexture(nil, "OVERLAY")
     arrow:SetSize(12, 12)
     arrow:SetPoint("RIGHT", dropdown, "RIGHT", -10, 0)
     arrow:SetTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up")
-    
-    -- Create the dropdown menu frame (initially hidden)
+
     local menu = _G.CreateFrame("Frame", nil, dropdown, "BackdropTemplate")
     menu:SetFrameStrata("FULLSCREEN_DIALOG")
     menu:SetBackdrop({
@@ -117,18 +113,15 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     menu:SetPoint("TOPLEFT", dropdown, "BOTTOMLEFT", 0, -2)
     menu:SetWidth(width or 200)
     menu:Hide()
-    
-    -- Create scroll frame for menu items
+
     local scrollFrame = _G.CreateFrame("ScrollFrame", nil, menu)
     scrollFrame:SetPoint("TOPLEFT", menu, "TOPLEFT", 8, -8)
-    scrollFrame:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", -28, 8) -- Leave space for scrollbar
-    
-    -- Create content frame for scroll
+    scrollFrame:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", -28, 8) 
+
     local scrollContent = _G.CreateFrame("Frame", nil, scrollFrame)
-    scrollContent:SetSize(1, 1) -- Will be resized dynamically
+    scrollContent:SetSize(1, 1) 
     scrollFrame:SetScrollChild(scrollContent)
-    
-    -- Create scrollbar
+
     local scrollBar = _G.CreateFrame("Slider", nil, menu, "BackdropTemplate")
     scrollBar:SetPoint("TOPRIGHT", menu, "TOPRIGHT", -8, -8)
     scrollBar:SetPoint("BOTTOMRIGHT", menu, "BOTTOMRIGHT", -8, 8)
@@ -136,9 +129,8 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     scrollBar:SetOrientation("VERTICAL")
     scrollBar:SetMinMaxValues(0, 100)
     scrollBar:SetValue(0)
-    scrollBar:Hide() -- Hidden by default, shown when needed
-    
-    -- Style the scrollbar to match step navigation (fallback to working textures)
+    scrollBar:Hide() 
+
     scrollBar:SetBackdrop({
         bgFile = "Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Background-Rock",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -149,22 +141,19 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     })
     scrollBar:SetBackdropColor(0.1, 0.1, 0.15, 0.8)
     scrollBar:SetBackdropBorderColor(0, 0, 0, 0.6)
-    
-    -- Create scrollbar thumb using Naowh blue
+
     local thumb = scrollBar:CreateTexture(nil, "OVERLAY")
     thumb:SetTexture("Interface\\Buttons\\WHITE8X8")
-    thumb:SetVertexColor(0.2, 0.6, 1.0, 0.9) -- Naowh signature blue
+    thumb:SetVertexColor(0.2, 0.6, 1.0, 0.9) 
     scrollBar:SetThumbTexture(thumb)
-    
-    -- Scrollbar functionality
+
     scrollBar:SetScript("OnValueChanged", function(_, value)
         local maxScroll = scrollContent:GetHeight() - scrollFrame:GetHeight()
         if maxScroll > 0 then
             scrollFrame:SetVerticalScroll(value * maxScroll / 100)
         end
     end)
-    
-    -- Mouse wheel scrolling
+
     menu:SetScript("OnMouseWheel", function(_, delta)
         if scrollBar:IsShown() then
             local currentValue = scrollBar:GetValue()
@@ -173,7 +162,7 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
         end
     end)
     menu:EnableMouseWheel(true)
-    
+
     dropdown.menu = menu
     dropdown.scrollFrame = scrollFrame
     dropdown.scrollContent = scrollContent
@@ -183,9 +172,8 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
     dropdown.options = {}
     dropdown.selectedIndex = nil
     dropdown.selectedOption = nil
-    dropdown.maxVisibleItems = 8 -- Maximum items to show before scrolling
-    
-    -- Click handler for dropdown
+    dropdown.maxVisibleItems = 8 
+
     dropdown:SetScript("OnMouseDown", function()
         if menu:IsShown() then
             menu:Hide()
@@ -193,26 +181,23 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
             dropdown:ShowMenu()
         end
     end)
-    
-    -- Close dropdown when clicking outside
+
     dropdown:SetScript("OnHide", function()
         menu:Hide()
     end)
-    
-    -- Hover effects
+
     dropdown:SetScript("OnEnter", function()
         dropdown:SetBackdropColor(0.25, 0.3, 0.45, 0.95)
         dropdown:SetBackdropBorderColor(0, 0, 0, 1)
         dropdownText:SetTextColor(1, 1, 1, 1)
     end)
-    
+
     dropdown:SetScript("OnLeave", function()
         dropdown:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
         dropdown:SetBackdropBorderColor(0, 0, 0, 0.8)
         dropdownText:SetTextColor(0.9, 0.9, 0.9, 1)
     end)
-    
-    -- Method to add options
+
     function dropdown:AddOption(optionText, value, onClick)
         local option = {
             text = optionText,
@@ -222,29 +207,25 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
         table.insert(self.options, option)
         self:UpdateMenu()
     end
-    
-    -- Method to update menu size and items
+
     function dropdown:UpdateMenu()
-        -- Clear existing menu items
+
         for _, child in ipairs({self.scrollContent:GetChildren()}) do
             child:Hide()
             child:SetParent(nil)
         end
-        
+
         local itemHeight = 25
         local numItems = #self.options
         local maxHeight = self.maxVisibleItems * itemHeight
         local actualHeight = math.min(numItems * itemHeight, maxHeight)
         local contentHeight = numItems * itemHeight
-        
-        -- Set menu height
-        self.menu:SetHeight(actualHeight + 16) -- Add padding
-        
-        -- Set scroll content height
+
+        self.menu:SetHeight(actualHeight + 16) 
+
         self.scrollContent:SetHeight(math.max(contentHeight, actualHeight))
         self.scrollContent:SetWidth(self.scrollFrame:GetWidth())
-        
-        -- Show/hide scrollbar based on content height
+
         if contentHeight > actualHeight then
             self.scrollBar:Show()
             self.scrollFrame:SetPoint("BOTTOMRIGHT", self.menu, "BOTTOMRIGHT", -28, 8)
@@ -252,16 +233,15 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
             self.scrollBar:Hide()
             self.scrollFrame:SetPoint("BOTTOMRIGHT", self.menu, "BOTTOMRIGHT", -8, 8)
         end
-        
-        -- Reset scroll position
+
         self.scrollBar:SetValue(0)
         self.scrollFrame:SetVerticalScroll(0)
-        
+
         for i, option in ipairs(self.options) do
             local item = _G.CreateFrame("Button", nil, self.scrollContent, "BackdropTemplate")
             item:SetSize(self.scrollContent:GetWidth() - 8, itemHeight - 2)
             item:SetPoint("TOPLEFT", self.scrollContent, "TOPLEFT", 4, -(i-1) * itemHeight - 2)
-            
+
             item:SetBackdrop({
                 bgFile = "Interface\\Buttons\\WHITE8X8",
                 edgeFile = nil,
@@ -271,22 +251,22 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
                 insets = { left = 0, right = 0, top = 0, bottom = 0 }
             })
             item:SetBackdropColor(0, 0, 0, 0)
-            
+
             local itemText = item:CreateFontString(nil, "OVERLAY", "GameFontNormal")
             itemText:SetPoint("LEFT", item, "LEFT", 8, 0)
             itemText:SetText(option.text)
             itemText:SetTextColor(0.9, 0.9, 0.9, 1)
-            
+
             item:SetScript("OnEnter", function()
                 item:SetBackdropColor(0.3, 0.3, 0.3, 0.5)
                 itemText:SetTextColor(1, 1, 1, 1)
             end)
-            
+
             item:SetScript("OnLeave", function()
                 item:SetBackdropColor(0, 0, 0, 0)
                 itemText:SetTextColor(0.9, 0.9, 0.9, 1)
             end)
-            
+
             item:SetScript("OnClick", function()
                 self.selectedIndex = i
                 self.selectedOption = option
@@ -298,34 +278,30 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
             end)
         end
     end
-    
-    -- Method to show menu with proper positioning
+
     function dropdown:ShowMenu()
         if #self.options > 0 then
             self:UpdateMenu()
-            
-            -- Calculate available space below and above dropdown
+
             local screenHeight = _G.GetScreenHeight()
             local dropdownBottom = dropdown:GetBottom()
             local dropdownTop = dropdown:GetTop()
             local menuHeight = self.menu:GetHeight()
-            
-            -- Check if menu fits below, otherwise position above
+
             if dropdownBottom - menuHeight > 0 then
-                -- Position below (normal)
+
                 self.menu:ClearAllPoints()
                 self.menu:SetPoint("TOPLEFT", dropdown, "BOTTOMLEFT", 0, -2)
             else
-                -- Position above
+
                 self.menu:ClearAllPoints()
                 self.menu:SetPoint("BOTTOMLEFT", dropdown, "TOPLEFT", 0, 2)
             end
-            
+
             self.menu:Show()
         end
     end
-    
-    -- Method to clear options
+
     function dropdown:ClearOptions()
         self.options = {}
         self.selectedIndex = nil
@@ -333,27 +309,24 @@ function NaowhUIInstaller:CreateModernDropdown(parent, width, height)
         self.text:SetText("Select an option...")
         self:UpdateMenu()
     end
-    
-    -- Method to get selected value
+
     function dropdown:GetSelectedValue()
         if self.selectedOption then
             return self.selectedOption.value
         end
         return nil
     end
-    
-    -- Method to get selected text
+
     function dropdown:GetSelectedText()
         if self.selectedOption then
             return self.selectedOption.text
         end
         return nil
     end
-    
+
     return dropdown
 end
 
--- Helper function to count recently installed items
 function NaowhUIInstaller:CountRecentlyInstalled()
     if not self.recentlyInstalled then return 0 end
     local count = 0
@@ -460,23 +433,20 @@ function NaowhUIInstaller:CreateFrame()
     header:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
     header:SetBackdropBorderColor(0, 0, 0, 0.8)
 
-    -- Create logo texture
     local logo = header:CreateTexture(nil, "ARTWORK")
-    logo:SetSize(240, 130) -- A bit larger for better prominence
-    logo:SetPoint("LEFT", header, "LEFT", 5, -21) -- Move down significantly more for proper centering
-    
-    -- Set logo texture based on game version
+    logo:SetSize(240, 130) 
+    logo:SetPoint("LEFT", header, "LEFT", 5, -21) 
+
     if NUI.Mists then
         logo:SetTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\NaowhUILogoMists.tga")
     elseif NUI.Classic then
         logo:SetTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\NaowhUILogoVanilla.tga")
-    else -- Retail/Standard
+    else 
         logo:SetTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\NaowhUILogo.tga")
     end
-    
-    -- Create "Installer" text next to logo
+
     local title = header:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("LEFT", logo, "RIGHT", 12, 20) -- Reduced spacing for better visual balance
+    title:SetPoint("LEFT", logo, "RIGHT", 12, 20) 
     title:SetText("Installer")
     title:SetFont("Interface\\AddOns\\NaowhUI\\Core\\Media\\Fonts\\Naowh.ttf", 48, "OUTLINE")
 
@@ -544,11 +514,10 @@ function NaowhUIInstaller:CreateFrame()
     scrollBar:SetOrientation("VERTICAL")
     scrollBar:SetValueStep(1)
     scrollBar:SetObeyStepOnDrag(true)
-    
-    -- Create scrollbar thumb with Naowh blue
+
     local thumb = scrollBar:CreateTexture(nil, "OVERLAY")
     thumb:SetTexture("Interface\\Buttons\\WHITE8X8")
-    thumb:SetVertexColor(0.2, 0.6, 1.0, 0.9) -- Naowh signature blue
+    thumb:SetVertexColor(0.2, 0.6, 1.0, 0.9) 
     scrollBar:SetThumbTexture(thumb)
 
     stepList.scrollBar = scrollBar
@@ -639,7 +608,6 @@ function NaowhUIInstaller:CreateFrame()
     local option4Alt = self:CreateModernButton(contentPanel, "Option 4", 180, 40)
     option4Alt:Hide()
 
-    -- Create dropdown and setup button for multiple options
     local optionDropdown = self:CreateModernDropdown(stepContentRegion, 300, 32)
     optionDropdown:SetPoint("TOP", desc3, "BOTTOM", 0, -40)
     optionDropdown:Hide()
@@ -1033,46 +1001,39 @@ function NaowhUIInstaller:RepositionOptionButtons()
 
     local buttonCount = #visibleButtons
     if buttonCount == 0 then return end
-    
-    -- Clear all positioning
+
     for _, btn in ipairs(visibleButtons) do
         btn:ClearAllPoints()
     end
-    
-    -- Hide dropdown and setup button by default
+
     self.optionDropdown:Hide()
     self.setupButton:Hide()
-    
+
     if buttonCount == 1 then
-        -- Single button - show as normal
+
         visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", 0, -40)
         visibleButtons[1]:Show()
     elseif buttonCount > 1 then
-        -- Multiple buttons - use dropdown instead
-        -- Hide all original buttons
+
         for _, btn in ipairs(visibleButtons) do
             btn:Hide()
         end
-        
-        -- Clear existing dropdown options
+
         self.optionDropdown:ClearOptions()
-        
-        -- Add each button's text and click handler to dropdown
+
         for i, btn in ipairs(visibleButtons) do
             local btnText = btn:GetFontString():GetText()
-            
+
             self.optionDropdown:AddOption(btnText, i, function(value)
-                -- Store the selected option for the setup button
+
                 self.selectedOptionIndex = value
                 self.selectedOptionButton = visibleButtons[value]
             end)
         end
-        
-        -- Show dropdown and setup button
+
         self.optionDropdown:Show()
         self.setupButton:Show()
-        
-        -- Set up the setup button click handler
+
         self.setupButton:SetScript("OnClick", function()
             if self.selectedOptionButton then
                 local btnScript = self.selectedOptionButton:GetScript("OnClick")
@@ -1147,14 +1108,12 @@ function NaowhUIInstaller:ClearContent()
     self.option3:SetScript("OnClick", nil)
     self.option4:Hide()
     self.option4:SetScript("OnClick", nil)
-    
-    -- Hide dropdown and setup button
+
     self.optionDropdown:Hide()
     self.optionDropdown:ClearOptions()
     self.setupButton:Hide()
     self.setupButton:SetScript("OnClick", nil)
-    
-    -- Hide dynamic options frame and clear any dynamic buttons
+
     self.dynamicOptionsFrame:Hide()
     self:ClearDynamicOptions()
 end
@@ -1169,22 +1128,19 @@ function NaowhUIInstaller:ClearDynamicOptions()
         btn:SetParent(nil)
     end
     self.dynamicButtons = {}
-    
-    -- Clear class dropdown if it exists
+
     if self.classDropdown then
         self.classDropdown:Hide()
         self.classDropdown:ClearOptions()
         self.classDropdown = nil
     end
-    
-    -- Clear class setup button if it exists
+
     if self.classSetupButton then
         self.classSetupButton:Hide()
         self.classSetupButton:SetScript("OnClick", nil)
         self.classSetupButton = nil
     end
-    
-    -- Clear class data references
+
     self.classesData = nil
     self.selectedClassIndex = nil
     self.selectedClassData = nil
@@ -1236,11 +1192,9 @@ function NaowhUIInstaller:CreateClassButtons()
     self:ClearDynamicOptions()
 
     self.dynamicOptionsFrame:Show()
-    
-    -- Get player's class for highlighting
+
     local playerClass = _G.select(2, _G.UnitClass("player"))
-    
-    -- Define class list (same order as files)
+
     local classes = {
         {name = "Death Knight", file = "DeathKnight", class = "DEATHKNIGHT"},
         {name = "Demon Hunter", file = "DemonHunter", class = "DEMONHUNTER"},
@@ -1256,66 +1210,58 @@ function NaowhUIInstaller:CreateClassButtons()
         {name = "Warlock", file = "Warlock", class = "WARLOCK"},
         {name = "Warrior", file = "Warrior", class = "WARRIOR"}
     }
-    
-    -- Since there are always multiple classes, use dropdown instead of buttons grid
+
     self:CreateClassDropdown(classes, playerClass)
 end
 
 function NaowhUIInstaller:CreateClassDropdown(classes, playerClass)
-    -- Create dropdown for class selection
+
     local classDropdown = self:CreateModernDropdown(self.dynamicOptionsFrame, 350, 32)
     classDropdown:SetPoint("TOP", self.dynamicOptionsFrame, "TOP", 0, -20)
-    
-    -- Create setup button
+
     local classSetupButton = self:CreateModernButton(self.dynamicOptionsFrame, "Setup", 120, 32)
     classSetupButton:SetPoint("TOP", classDropdown, "BOTTOM", 0, -15)
-    
-    -- Store references for cleanup
+
     self.classDropdown = classDropdown
     self.classSetupButton = classSetupButton
     self.classesData = classes
-    
-    -- Populate dropdown with class options
+
     for i, classData in ipairs(classes) do
         local displayName = classData.name
         local isPlayerClass = classData.class == playerClass
-        
-        -- Mark player's current class
+
         if isPlayerClass then
             displayName = classData.name .. " (Current)"
         end
-        
+
         classDropdown:AddOption(displayName, i, function(value)
-            -- Store selected class data
+
             self.selectedClassIndex = value
             self.selectedClassData = classes[value]
-            
-            -- Update dropdown text color for current class
+
             if classes[value].class == playerClass then
-                classDropdown.text:SetTextColor(0.0, 1.0, 0.0, 1) -- Bright green for current class
+                classDropdown.text:SetTextColor(0.0, 1.0, 0.0, 1) 
             else
-                classDropdown.text:SetTextColor(0.9, 0.9, 0.9, 1) -- Normal color for other classes
+                classDropdown.text:SetTextColor(0.9, 0.9, 0.9, 1) 
             end
         end)
-        
-        -- Auto-select player's current class
+
         if isPlayerClass then
             classDropdown.selectedIndex = i
             classDropdown.selectedOption = classDropdown.options[i]
             classDropdown.text:SetText(displayName)
-            classDropdown.text:SetTextColor(0.0, 1.0, 0.0, 1) -- Bright green for current class
+            classDropdown.text:SetTextColor(0.0, 1.0, 0.0, 1) 
             self.selectedClassIndex = i
             self.selectedClassData = classData
         end
     end
-    
-    -- Setup button click handler
+
     classSetupButton:SetScript("OnClick", function()
         if self.selectedClassData then
             self:InstallClassWeakAuras(self.selectedClassData.file)
         end
     end)
-    
+
     classDropdown:Show()
     classSetupButton:Show()
 end
