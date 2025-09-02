@@ -13,12 +13,10 @@ local CONTENT_PANEL_WIDTH = FRAME_WIDTH - STEP_PANEL_WIDTH
 
 local NaowhUIInstaller = {}
 
--- Function to create modern styled buttons
 function NaowhUIInstaller:CreateModernButton(parent, text, width, height, buttonType)
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
     btn:SetSize(width or 120, height or 32)
-    
-    -- Use the same border style as the main frame for consistency
+
     btn:SetBackdrop({
         bgFile = "Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Background-Rock",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -27,23 +25,23 @@ function NaowhUIInstaller:CreateModernButton(parent, text, width, height, button
         edgeSize = 4,
         insets = { left = 1, right = 1, top = 1, bottom = 1 }
     })
-    
+
     if buttonType == "class" then
         btn:SetBackdropColor(0.12, 0.12, 0.18, 0.95)
         btn:SetBackdropBorderColor(0, 0, 0, 0.8)
-        
+
         local fontString = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         fontString:SetPoint("CENTER")
         fontString:SetText(text or "Button")
         fontString:SetTextColor(0.9, 0.9, 0.9, 1)
         btn:SetFontString(fontString)
-        
+
         btn:SetScript("OnEnter", function()
             btn:SetBackdropColor(0.2, 0.25, 0.35, 0.95)
             btn:SetBackdropBorderColor(0, 0, 0, 1)
             fontString:SetTextColor(1, 1, 1, 1)
         end)
-        
+
         btn:SetScript("OnLeave", function()
             btn:SetBackdropColor(0.12, 0.12, 0.18, 0.95)
             btn:SetBackdropBorderColor(0, 0, 0, 0.8)
@@ -52,30 +50,29 @@ function NaowhUIInstaller:CreateModernButton(parent, text, width, height, button
     else
         btn:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
         btn:SetBackdropBorderColor(0, 0, 0, 0.8)
-        
+
         local fontString = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         fontString:SetPoint("CENTER")
         fontString:SetText(text or "Button")
         fontString:SetTextColor(0.9, 0.9, 0.9, 1)
         btn:SetFontString(fontString)
-        
+
         btn:SetScript("OnEnter", function()
             btn:SetBackdropColor(0.25, 0.3, 0.45, 0.95)
             btn:SetBackdropBorderColor(0, 0, 0, 1)
             fontString:SetTextColor(1, 1, 1, 1)
         end)
-        
+
         btn:SetScript("OnLeave", function()
             btn:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
             btn:SetBackdropBorderColor(0, 0, 0, 0.8)
             fontString:SetTextColor(0.9, 0.9, 0.9, 1)
         end)
     end
-    
+
     return btn
 end
 
--- Helper function to count recently installed items
 function NaowhUIInstaller:CountRecentlyInstalled()
     if not self.recentlyInstalled then return 0 end
     local count = 0
@@ -86,16 +83,15 @@ function NaowhUIInstaller:CountRecentlyInstalled()
 end
 
 function NaowhUIInstaller:GetVersionStatusForStep(stepTitle, stepIndex)
-    -- Step 1 is always the Welcome screen - use default color
+
     if stepIndex == 1 then
         return "default"
     end
-    
-    -- WeakAuras don't have individual version tracking, always use default colors
+
     if stepTitle == "General WeakAuras" or stepTitle == "Class WeakAuras" then
         return "default"
     end
-    
+
     local addonMap = {
         ["ElvUI"] = "ElvUI",
         ["BigWigs"] = "BigWigs",
@@ -106,28 +102,27 @@ function NaowhUIInstaller:GetVersionStatusForStep(stepTitle, stepIndex)
         ["Plater"] = "Plater",
         ["WarpDeplete"] = "WarpDeplete"
     }
-    
+
     local addonName = addonMap[stepTitle]
     if not addonName then
         return "default"
     end
-    
-    -- Check if this addon was recently installed this session
+
     if self.recentlyInstalled and self.recentlyInstalled[addonName] then
         return "uptodate"
     end
-    
+
     local currentVersion = NUI.version
-    
+
     if NUI.db and NUI.db.global and NUI.db.global.profiles then
         local installedVersion = NUI.db.global.profiles[addonName]
-        
+
         if installedVersion then
-            -- Compare versions - if they match, it's up to date (green)
+
             if installedVersion == currentVersion then
                 return "uptodate"
             else
-                -- Version exists but doesn't match - needs update (red)
+
                 return "outdated"
             end
         else
@@ -143,7 +138,6 @@ function NaowhUIInstaller:CreateFrame()
         return self.frame
     end
 
-    -- Initialize recently installed tracking only if it doesn't exist
     if not self.recentlyInstalled then
         self.recentlyInstalled = {}
     end
@@ -158,7 +152,7 @@ function NaowhUIInstaller:CreateFrame()
     frame:RegisterForDrag("LeftButton")
     frame:SetScript("OnDragStart", frame.StartMoving)
     frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-    
+
     frame:SetBackdrop({
         bgFile = "Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Background-Rock",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -193,17 +187,15 @@ function NaowhUIInstaller:CreateFrame()
     local closeBtn = CreateFrame("Button", nil, header)
     closeBtn:SetSize(32, 32)
     closeBtn:SetPoint("TOPRIGHT", header, "TOPRIGHT", -8, -8)
-    
-    -- Set button textures using the UI Panel minimize button textures
+
     closeBtn:SetNormalTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Up")
     closeBtn:SetPushedTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Down")
     closeBtn:SetHighlightTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Up")
     closeBtn:SetDisabledTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Panel-MinimizeButton-Disabled")
-    
-    -- Set highlight blend mode
+
     closeBtn:GetHighlightTexture():SetBlendMode("ADD")
     closeBtn:GetHighlightTexture():SetAlpha(0.3)
-    
+
     closeBtn:SetScript("OnClick", function() self:Hide() end)
 
     local stepPanel = CreateFrame("Frame", nil, frame, "BackdropTemplate")
@@ -238,8 +230,7 @@ function NaowhUIInstaller:CreateFrame()
     local stepList = CreateFrame("ScrollFrame", nil, stepPanel, "BackdropTemplate")
     stepList:SetPoint("TOPLEFT", stepPanel, "TOPLEFT", 10, -10)
     stepList:SetPoint("BOTTOMRIGHT", stepPanel, "BOTTOMRIGHT", -30, 50)
-    
-    -- Create custom scrollbar
+
     local scrollBar = CreateFrame("Slider", nil, stepList, "BackdropTemplate")
     scrollBar:SetPoint("TOPRIGHT", stepList, "TOPRIGHT", 20, 0)
     scrollBar:SetPoint("BOTTOMRIGHT", stepList, "BOTTOMRIGHT", 20, 0)
@@ -257,17 +248,15 @@ function NaowhUIInstaller:CreateFrame()
     scrollBar:SetOrientation("VERTICAL")
     scrollBar:SetValueStep(1)
     scrollBar:SetObeyStepOnDrag(true)
-    
-    -- Create scrollbar thumb
+
     local thumb = scrollBar:CreateTexture(nil, "OVERLAY")
     thumb:SetTexture("Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\minimalscrollbarproportional")
     thumb:SetVertexColor(0.4, 0.5, 0.7, 0.9)
     scrollBar:SetThumbTexture(thumb)
-    
-    -- Set up scroll functionality
+
     stepList.scrollBar = scrollBar
     stepList:EnableMouseWheel(true)
-    
+
     stepList:SetScript("OnMouseWheel", function(_, delta)
         local current = scrollBar:GetValue()
         local min, max = scrollBar:GetMinMaxValues()
@@ -277,7 +266,7 @@ function NaowhUIInstaller:CreateFrame()
             scrollBar:SetValue(math.min(max, current + 20))
         end
     end)
-    
+
     scrollBar:SetScript("OnValueChanged", function(_, value)
         stepList:SetVerticalScroll(value)
     end)
@@ -423,7 +412,7 @@ function NaowhUIInstaller:CreateStepButtons(installer)
         local btn = CreateFrame("Button", nil, self.stepContent, "BackdropTemplate")
         btn:SetSize(STEP_PANEL_WIDTH - 40, 30)
         btn:SetPoint("TOPLEFT", self.stepContent, "TOPLEFT", 0, -(i-1) * 35)
-        
+
         btn:SetBackdrop({
             bgFile = "Interface\\AddOns\\NaowhUI\\Core\\Media\\Textures\\UI-Background-Marble",
             edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -432,7 +421,7 @@ function NaowhUIInstaller:CreateStepButtons(installer)
             edgeSize = 4,
             insets = { left = 1, right = 1, top = 1, bottom = 1 }
         })
-        
+
         local versionStatus = self:GetVersionStatusForStep(title, i)
         if versionStatus == "uptodate" then
             btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95)
@@ -451,8 +440,8 @@ function NaowhUIInstaller:CreateStepButtons(installer)
         local text = btn:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         text:SetPoint("CENTER")
         text:SetText(title)
-        btn:SetFontString(text)  -- Associate the font string with the button
-        
+        btn:SetFontString(text)  
+
         if versionStatus == "uptodate" then
             text:SetTextColor(0.0, 1.0, 0.0, 1)
         elseif versionStatus == "outdated" then
@@ -532,9 +521,9 @@ function NaowhUIInstaller:UpdateStepButtons()
     if not self.stepButtons then
         return
     end
-    
+
     for i, btn in pairs(self.stepButtons) do
-        -- Recalculate version status to ensure we have the latest state
+
         if self.installer and self.installer.StepTitles then
             local stepTitle = self.installer.StepTitles[i]
             if stepTitle then
@@ -542,9 +531,9 @@ function NaowhUIInstaller:UpdateStepButtons()
                 btn.versionStatus = newStatus
             end
         end
-        
+
         local text = btn:GetFontString()
-        
+
         if i == self.currentStep then
             if btn.versionStatus == "uptodate" then
                 btn:SetBackdropColor(0.1, 0.5, 0.1, 0.95)
@@ -586,16 +575,15 @@ function NaowhUIInstaller:RefreshAllStepButtons()
     if not self or not self.stepButtons or not self.installer or not self.installer.StepTitles then
         return
     end
-    
+
     for i, btn in pairs(self.stepButtons) do
         local stepTitle = self.installer.StepTitles[i]
         if stepTitle then
             local versionStatus = self:GetVersionStatusForStep(stepTitle, i)
             btn.versionStatus = versionStatus
-            
-            -- Update color for ALL buttons, including current step
+
             local text = btn:GetFontString()
-            
+
             if versionStatus == "uptodate" then
                 btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95)
                 btn:SetBackdropBorderColor(0.0, 0.8, 0.0, 0.9)
@@ -613,7 +601,7 @@ function NaowhUIInstaller:RefreshAllStepButtons()
                 btn:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.6)
                 if text then text:SetTextColor(0.9, 0.9, 0.9, 1) end
             end
-            
+
             if i == self.currentStep then
                 if versionStatus == "uptodate" then
                     btn:SetBackdropColor(0.1, 0.5, 0.1, 0.95)
@@ -638,14 +626,14 @@ function NaowhUIInstaller:Show(installer)
     if not installer then
         return
     end
-    
+
     self:CreateFrame()
     self.installer = installer
-    
+
     self:CreateStepButtons(installer)
-    
+
     self.frame:Show()
-    
+
     self:GoToStep(1)
 end
 
@@ -661,17 +649,17 @@ function NaowhUIInstaller:GoToStep(step)
     end
 
     self.currentStep = step
-    
+
     self:ClearContent()
     self:UpdateStepButtons()
-    
+
     if self.prevBtn then
         self.prevBtn:SetEnabled(step > 1)
     end
-    
+
     if self.nextBtn and self.installer.StepTitles then
         self.nextBtn:SetEnabled(step < #self.installer.StepTitles)
-        
+
         if step >= #self.installer.StepTitles then
             self.nextBtn:SetText("Finish")
         else
@@ -679,10 +667,9 @@ function NaowhUIInstaller:GoToStep(step)
         end
     end
 
-    -- Set up the PluginInstallFrame compatibility layer
     _G.PluginInstallFrame = {
         Title = self.subtitle,
-        SubTitle = self.subtitle,  -- This should map to the main subtitle, not desc1
+        SubTitle = self.subtitle,  
         Desc1 = self.desc1,
         Desc2 = self.desc2,
         Desc3 = self.desc3,
@@ -696,42 +683,35 @@ function NaowhUIInstaller:GoToStep(step)
         CreateClassButtons = function() return self:CreateClassButtons() end,
         ShowTutorialImage = function(imagePath) return self:ShowTutorialImage(imagePath) end
     }
-    
-    -- Override SE:Setup to add our tracking
+
     local SE = NUI:GetModule("Setup")
     if SE and SE.Setup then
         local originalSetup = SE.Setup
-        local installerSelf = self  -- Capture the correct self reference
+        local installerSelf = self  
         SE.Setup = function(setupModule, addonName, ...)
             local result = originalSetup(setupModule, addonName, ...)
-            
+
             if addonName and installerSelf.recentlyInstalled then
-                -- Don't mark WeakAuras as recently installed to prevent green status
+
                 if addonName ~= "WeakAuras" then
                     installerSelf.recentlyInstalled[addonName] = true
                 end
-                
-                -- Skip marking WeakAuras steps as recently installed
-                -- if addonName == "WeakAuras" then
-                --     installerSelf.recentlyInstalled["General WeakAuras"] = true
-                --     installerSelf.recentlyInstalled["Class WeakAuras"] = true
-                -- end
-                
+
                 if installerSelf and installerSelf.RefreshAllStepButtons then
                     installerSelf:RefreshAllStepButtons()
                 end
             end
-            
+
             return result
         end
     end
 
     self.installer.Pages[step]()
-    
+
     if step == 1 then
         self.desc2:SetText("If updating, click addons highlighted in red and 'Setup'")
     end
-    
+
     self:RepositionOptionButtons()
     self:SetSubtitleFont()
 end
@@ -742,44 +722,44 @@ function NaowhUIInstaller:RepositionOptionButtons()
     if self.option2:IsShown() then table.insert(visibleButtons, self.option2) end
     if self.option3:IsShown() then table.insert(visibleButtons, self.option3) end
     if self.option4:IsShown() then table.insert(visibleButtons, self.option4) end
-    
+
     local buttonCount = #visibleButtons
     if buttonCount == 0 then return end
-    
+
     for _, btn in ipairs(visibleButtons) do
         btn:ClearAllPoints()
     end
-    
+
     local buttonWidth = 180
     local spacing = 20
     local contentPadding = 60
     local usableWidth = CONTENT_PANEL_WIDTH - contentPadding
-    
+
     if buttonCount == 1 then
         visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", 0, -40)
     elseif buttonCount == 2 then
-        -- Two buttons - ensure they fit within bounds
+
         local totalWidth = (buttonWidth * 2) + spacing
         local startOffset = -(totalWidth / 2) + (buttonWidth / 2)
         visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset, -40)
         visibleButtons[2]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset + buttonWidth + spacing, -40)
     elseif buttonCount == 3 then
-        -- Three buttons - ensure they fit within bounds
+
         local totalWidth = (buttonWidth * 3) + (spacing * 2)
         if totalWidth > usableWidth then
-            -- Stack vertically if too wide
+
             visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", 0, -40)
             visibleButtons[2]:SetPoint("TOP", visibleButtons[1], "BOTTOM", 0, -10)
             visibleButtons[3]:SetPoint("TOP", visibleButtons[2], "BOTTOM", 0, -10)
         else
-            -- Fit horizontally
+
             local startOffset = -(totalWidth / 2) + (buttonWidth / 2)
             visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset, -40)
             visibleButtons[2]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset + buttonWidth + spacing, -40)
             visibleButtons[3]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset + (buttonWidth + spacing) * 2, -40)
         end
     elseif buttonCount == 4 then
-        -- Four buttons - stack vertically to ensure they fit
+
         visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", 0, -40)
         visibleButtons[2]:SetPoint("TOP", visibleButtons[1], "BOTTOM", 0, -10)
         visibleButtons[3]:SetPoint("TOP", visibleButtons[2], "BOTTOM", 0, -10)
@@ -792,12 +772,12 @@ function NaowhUIInstaller:NextStep()
         self:Hide()
         return
     end
-    
+
     if self.currentStep >= #self.installer.StepTitles then
         self:Hide()
         return
     end
-    
+
     self:GoToStep(self.currentStep + 1)
 end
 
@@ -808,45 +788,40 @@ function NaowhUIInstaller:PreviousStep()
 end
 
 function NaowhUIInstaller:SetSubtitleFont()
-    -- Ensure the subtitle font is properly set
+
     if self.subtitle then
         self.subtitle:SetFont("Interface\\AddOns\\NaowhUI\\Core\\Media\\Fonts\\Naowh.ttf", 24, "OUTLINE")
-        self.subtitle:SetTextColor(1, 1, 1, 1) -- White text
+        self.subtitle:SetTextColor(1, 1, 1, 1) 
     end
 end
 
 function NaowhUIInstaller:ClearContent()
-    -- Clear text content
+
     self.subtitle:SetText("")
     self.desc1:SetText("")
     self.desc2:SetText("")
     self.desc3:SetText("")
-    
-    -- Reset subtitle position based on current step
+
     self.subtitle:ClearAllPoints()
     if self.currentStep == 1 then
-        -- Welcome screen positioning - will be further adjusted when image is shown
+
         self.subtitle:SetPoint("TOP", self.stepContentRegion, "TOP", 0, -50)
     else
-        -- Standard positioning for other screens
+
         self.subtitle:SetPoint("TOP", self.stepContentRegion, "TOP", 0, 0)
     end
-    
-    -- Ensure width constraints are maintained after clearing
+
     self.subtitle:SetWidth(CONTENT_PANEL_WIDTH - 96)
     self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96)
     self.desc2:SetWidth(CONTENT_PANEL_WIDTH - 96)
     self.desc3:SetWidth(CONTENT_PANEL_WIDTH - 96)
-    
-    -- Ensure subtitle font is properly set after clearing
+
     self:SetSubtitleFont()
-    
-    -- Hide tutorial image and reset desc1 position to always follow subtitle
+
     self.tutorialImage:Hide()
     self.desc1:ClearAllPoints()
     self.desc1:SetPoint("TOP", self.subtitle, "BOTTOM", 0, -20)
-    
-    -- Hide and clear option buttons
+
     self.option1:Hide()
     self.option1:SetScript("OnClick", nil)
     self.option2:Hide()
@@ -855,8 +830,7 @@ function NaowhUIInstaller:ClearContent()
     self.option3:SetScript("OnClick", nil)
     self.option4:Hide()
     self.option4:SetScript("OnClick", nil)
-    
-    -- Hide dynamic options frame and clear any dynamic buttons
+
     self.dynamicOptionsFrame:Hide()
     self:ClearDynamicOptions()
 end
@@ -866,8 +840,7 @@ function NaowhUIInstaller:ClearDynamicOptions()
         self.dynamicButtons = {}
         return
     end
-    
-    -- Hide and remove all dynamic buttons
+
     for _, btn in pairs(self.dynamicButtons) do
         btn:Hide()
         btn:SetParent(nil)
@@ -879,59 +852,51 @@ function NaowhUIInstaller:ShowTutorialImage(imagePath)
     if imagePath and self.tutorialImage then
         self.tutorialImage:SetTexture(imagePath)
         self.tutorialImage:Show()
-        
-        -- For welcome screen (step 1), center the layout
+
         if self.currentStep == 1 then
-            -- Center subtitle and image horizontally for welcome screen
+
             self.subtitle:ClearAllPoints()
             self.subtitle:SetPoint("TOP", self.stepContentRegion, "TOP", 0, -45)
-            self.subtitle:SetWidth(CONTENT_PANEL_WIDTH - 96) -- Maintain width constraint
-            
+            self.subtitle:SetWidth(CONTENT_PANEL_WIDTH - 96) 
+
             self.tutorialImage:ClearAllPoints()
             self.tutorialImage:SetPoint("TOP", self.subtitle, "BOTTOM", 0, -30)
-            
-            -- Position desc1 below the image for welcome screen
+
             self.desc1:ClearAllPoints()
             self.desc1:SetPoint("TOP", self.tutorialImage, "BOTTOM", 0, -30)
-            self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) -- Maintain width constraint
+            self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) 
         else
-            -- For other steps, use standard positioning
+
             self.tutorialImage:ClearAllPoints()
             self.tutorialImage:SetPoint("TOP", self.subtitle, "BOTTOM", 0, -20)
-            
-            -- Position desc1 below the image for other screens
+
             self.desc1:ClearAllPoints()
             self.desc1:SetPoint("TOP", self.tutorialImage, "BOTTOM", 0, -20)
-            self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) -- Maintain width constraint
+            self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) 
         end
     else
-        -- Hide image and reset positions
+
         self.tutorialImage:Hide()
-        
-        -- Reset subtitle position for non-welcome screens
+
         if self.currentStep ~= 1 then
             self.subtitle:ClearAllPoints()
             self.subtitle:SetPoint("TOP", self.stepContentRegion, "TOP", 0, 0)
-            self.subtitle:SetWidth(CONTENT_PANEL_WIDTH - 96) -- Maintain width constraint
+            self.subtitle:SetWidth(CONTENT_PANEL_WIDTH - 96) 
         end
-        
-        -- Always position desc1 below subtitle when no image is shown
+
         self.desc1:ClearAllPoints()
         self.desc1:SetPoint("TOP", self.subtitle, "BOTTOM", 0, -20)
-        self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) -- Maintain width constraint
+        self.desc1:SetWidth(CONTENT_PANEL_WIDTH - 96) 
     end
 end
 
 function NaowhUIInstaller:CreateClassButtons()
     self:ClearDynamicOptions()
-    
-    -- Show the dynamic options frame
+
     self.dynamicOptionsFrame:Show()
-    
-    -- Get player's class for highlighting
+
     local playerClass = select(2, UnitClass("player"))
-    
-    -- Define class list (same order as files)
+
     local classes = {
         {name = "Death Knight", file = "DeathKnight", class = "DEATHKNIGHT"},
         {name = "Demon Hunter", file = "DemonHunter", class = "DEMONHUNTER"},
@@ -947,75 +912,68 @@ function NaowhUIInstaller:CreateClassButtons()
         {name = "Warlock", file = "Warlock", class = "WARLOCK"},
         {name = "Warrior", file = "Warrior", class = "WARRIOR"}
     }
-    
+
     self.dynamicButtons = {}
     local buttonsPerRow = 3
-    local buttonWidth = 150  -- Reduced from 160 to provide more margin
-    local buttonHeight = 45  -- Reduced from 50 for better spacing
-    local horizontalSpacing = 20  -- Increased spacing between buttons
-    local verticalSpacing = 12   -- Increased vertical spacing
-    
-    -- Calculate total width of the button grid
+    local buttonWidth = 150  
+    local buttonHeight = 45  
+    local horizontalSpacing = 20  
+    local verticalSpacing = 12   
+
     local totalGridWidth = (buttonWidth * buttonsPerRow) + (horizontalSpacing * (buttonsPerRow - 1))
-    
-    -- Get the actual frame width and ensure proper centering with margins
+
     local frameWidth = self.dynamicOptionsFrame:GetWidth()
     local gridStartX = (frameWidth - totalGridWidth) / 2
-    
-    -- Ensure we have at least 20 pixels margin on each side
+
     local minMargin = 20
     if gridStartX < minMargin then
         gridStartX = minMargin
-        -- If we don't have enough space, reduce button width
+
         local availableWidth = frameWidth - (2 * minMargin)
         local newButtonWidth = (availableWidth - (horizontalSpacing * (buttonsPerRow - 1))) / buttonsPerRow
         if newButtonWidth < buttonWidth then
-            buttonWidth = math.max(newButtonWidth, 120) -- Minimum button width of 120
+            buttonWidth = math.max(newButtonWidth, 120) 
             totalGridWidth = (buttonWidth * buttonsPerRow) + (horizontalSpacing * (buttonsPerRow - 1))
             gridStartX = (frameWidth - totalGridWidth) / 2
         end
     end
-    
+
     for i, classData in ipairs(classes) do
         local row = math.floor((i - 1) / buttonsPerRow)
         local col = (i - 1) % buttonsPerRow
-        
+
         local btn = self:CreateModernButton(self.dynamicOptionsFrame, classData.name,
                                            buttonWidth, buttonHeight, "class")
-        
-        -- Position relative to the dynamicOptionsFrame
+
         local xOffset = gridStartX + col * (buttonWidth + horizontalSpacing)
         local yOffset = -row * (buttonHeight + verticalSpacing)
-        
+
         btn:SetPoint("TOPLEFT", self.dynamicOptionsFrame, "TOPLEFT", xOffset, yOffset)
-        
-        -- Highlight player's class with bright neon green coloring
+
         if classData.class == playerClass then
             btn:SetText(classData.name .. " (Current)")
-            -- Override the standard styling for the player's class
-            btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95) -- Bright green background
-            btn:SetBackdropBorderColor(0.0, 0.8, 0.0, 0.9) -- Bright green border
-            btn:GetFontString():SetTextColor(0.0, 1.0, 0.0, 1) -- Bright green text
-            
-            -- Update hover effects for player's class
+
+            btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95) 
+            btn:SetBackdropBorderColor(0.0, 0.8, 0.0, 0.9) 
+            btn:GetFontString():SetTextColor(0.0, 1.0, 0.0, 1) 
+
             btn:SetScript("OnEnter", function()
-                btn:SetBackdropColor(0.1, 0.5, 0.1, 0.95) -- Brighter green on hover
-                btn:SetBackdropBorderColor(0.2, 1.0, 0.2, 1.0) -- Brighter green border
+                btn:SetBackdropColor(0.1, 0.5, 0.1, 0.95) 
+                btn:SetBackdropBorderColor(0.2, 1.0, 0.2, 1.0) 
                 btn:GetFontString():SetTextColor(0.0, 1.0, 0.0, 1)
             end)
-            
+
             btn:SetScript("OnLeave", function()
-                btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95) -- Back to bright green
-                btn:SetBackdropBorderColor(0.0, 0.8, 0.0, 0.9) -- Back to bright green border
+                btn:SetBackdropColor(0.0, 0.4, 0.0, 0.95) 
+                btn:SetBackdropBorderColor(0.0, 0.8, 0.0, 0.9) 
                 btn:GetFontString():SetTextColor(0.0, 1.0, 0.0, 1)
             end)
         end
-        
-        -- Set click handler
+
         btn:SetScript("OnClick", function()
             self:InstallClassWeakAuras(classData.file)
         end)
-        
+
         btn:Show()
         self.dynamicButtons[i] = btn
     end
@@ -1025,13 +983,12 @@ function NaowhUIInstaller:ExtractAddonNameFromCurrentStep()
     if not self.installer or not self.installer.StepTitles or not self.currentStep then
         return nil
     end
-    
+
     local stepTitle = self.installer.StepTitles[self.currentStep]
     if not stepTitle then
         return nil
     end
-    
-    -- Map step titles to addon names
+
     local addonMap = {
         ["ElvUI"] = "ElvUI",
         ["BigWigs"] = "BigWigs",
@@ -1044,7 +1001,7 @@ function NaowhUIInstaller:ExtractAddonNameFromCurrentStep()
         ["General WeakAuras"] = "General WeakAuras",
         ["Class WeakAuras"] = "Class WeakAuras"
     }
-    
+
     return addonMap[stepTitle]
 end
 
@@ -1056,36 +1013,34 @@ function NaowhUIInstaller:MarkAsRecentlyInstalled(addonName)
 end
 
 function NaowhUIInstaller:RefreshStepButtonStatus(stepTitle)
-    -- Find the button for this step and update its version status
+
     if not self.installer or not self.installer.StepTitles then
         return
     end
-    
+
     for i, title in ipairs(self.installer.StepTitles) do
         if title == stepTitle then
             local btn = self.stepButtons[i]
             if btn then
                 local newStatus = self:GetVersionStatusForStep(title, i)
                 btn.versionStatus = newStatus
-                
-                -- Update colors based on new status
+
                 local text = btn:GetFontString()
-                
-                -- If this is the current step, we need to use the current step styling
+
                 if i == self.currentStep then
-                    -- Current step: Always use white text with glowing border for visibility
+
                     if newStatus == "uptodate" then
                         btn:SetBackdropColor(0.1, 0.5, 0.1, 0.95)
-                        btn:SetBackdropBorderColor(0.4, 1.0, 0.4, 1.0)  -- Bright glowing green border
+                        btn:SetBackdropBorderColor(0.4, 1.0, 0.4, 1.0)  
                     elseif newStatus == "outdated" then
                         btn:SetBackdropColor(0.5, 0.1, 0.15, 0.95)
-                        btn:SetBackdropBorderColor(1.0, 0.4, 0.4, 1.0)  -- Bright glowing red border
+                        btn:SetBackdropBorderColor(1.0, 0.4, 0.4, 1.0)  
                     elseif newStatus == "notinstalled" then
                         btn:SetBackdropColor(0.3, 0.3, 0.3, 0.95)
-                        btn:SetBackdropBorderColor(1.0, 1.0, 1.0, 1.0)  -- Bright glowing white border
+                        btn:SetBackdropBorderColor(1.0, 1.0, 1.0, 1.0)  
                     else
                         btn:SetBackdropColor(0.15, 0.2, 0.35, 0.95)
-                        btn:SetBackdropBorderColor(0.5, 0.7, 1.0, 1.0)  -- Bright glowing blue border
+                        btn:SetBackdropBorderColor(0.5, 0.7, 1.0, 1.0)  
                     end
                     text:SetTextColor(1.0, 1.0, 1.0, 1)
                 else
@@ -1127,18 +1082,16 @@ end
 
 function NaowhUIInstaller:InstallClassWeakAuras(className)
     local SE = NUI:GetModule("Setup")
-    
+
     if SE and SE.Setup then
         NUI:LoadData()
-        
+
         C_Timer.After(0.1, function()
             if NUI[className] then
                 SE:Setup("WeakAuras", nil, nil, nil, nil, className)
-                -- Don't mark WeakAuras as recently installed to prevent green status
-                -- self:MarkAsRecentlyInstalled("Class WeakAuras")
-                -- Refresh immediately after setup
+
                 self:RefreshStepButtonStatus("Class WeakAuras")
-                -- Also refresh after a short delay in case the status change is async
+
                 C_Timer.After(0.2, function()
                     self:RefreshStepButtonStatus("Class WeakAuras")
                 end)
@@ -1150,11 +1103,10 @@ function NaowhUIInstaller:InstallClassWeakAuras(className)
     end
 end
 
--- Create compatibility layer for existing installer code
 function NaowhUIInstaller:CreateCompatibilityLayer()
-    -- Create a global PluginInstallFrame equivalent
+
     _G.PluginInstallFrame = {
-        SubTitle = self.subtitle,  -- This should map to the main subtitle
+        SubTitle = self.subtitle,  
         Desc1 = self.desc1,
         Desc2 = self.desc2,
         Desc3 = self.desc3,
@@ -1162,18 +1114,16 @@ function NaowhUIInstaller:CreateCompatibilityLayer()
         Option2 = self.option2,
         Option3 = self.option3,
         IsShown = function() return self.frame and self.frame:IsShown() end,
-        -- For backward compatibility with old installer code
+
         Show = function() end,
         Hide = function() end,
-        -- New method for class WeakAuras
+
         CreateClassButtons = function() return self:CreateClassButtons() end
     }
 end
 
--- Initialize on load
 local installerFrame = NaowhUIInstaller
 installerFrame:CreateFrame()
 installerFrame:CreateCompatibilityLayer()
 
--- Make it globally accessible
 _G.NaowhUIInstaller = installerFrame
