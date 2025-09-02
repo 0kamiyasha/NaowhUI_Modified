@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Core.lua"/>
 	<Script file="Generic.lua"/>
+	<Script file="Raid.lua"/>
 	<Script file="Season3.lua"/>
 </Ui>

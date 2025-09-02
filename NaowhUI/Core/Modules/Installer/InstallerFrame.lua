@@ -91,12 +91,8 @@ function NaowhUIInstaller:GetVersionStatusForStep(stepTitle, stepIndex)
         return "default"
     end
     
-    -- WeakAuras don't have individual version tracking, use default colors
+    -- WeakAuras don't have individual version tracking, always use default colors
     if stepTitle == "General WeakAuras" or stepTitle == "Class WeakAuras" then
-        -- Check if WeakAuras was recently installed this session
-        if self.recentlyInstalled and self.recentlyInstalled[stepTitle] then
-            return "uptodate"
-        end
         return "default"
     end
     
@@ -341,6 +337,10 @@ function NaowhUIInstaller:CreateFrame()
     option3:SetPoint("TOP", option2, "BOTTOM", 0, -15)
     option3:Hide()
 
+    local option4 = self:CreateModernButton(stepContentRegion, "Option 4", 180, 40)
+    option4:SetPoint("TOP", option3, "BOTTOM", 0, -15)
+    option4:Hide()
+
     local option1Alt = self:CreateModernButton(contentPanel, "Option 1", 180, 40)
     option1Alt:Hide()
 
@@ -349,6 +349,9 @@ function NaowhUIInstaller:CreateFrame()
 
     local option3Alt = self:CreateModernButton(contentPanel, "Option 3", 180, 40)
     option3Alt:Hide()
+
+    local option4Alt = self:CreateModernButton(contentPanel, "Option 4", 180, 40)
+    option4Alt:Hide()
 
     local dynamicOptionsFrame = CreateFrame("Frame", nil, stepContentRegion)
     dynamicOptionsFrame:SetPoint("TOP", desc3, "BOTTOM", 0, -80)
@@ -387,9 +390,11 @@ function NaowhUIInstaller:CreateFrame()
     self.option1 = option1
     self.option2 = option2
     self.option3 = option3
+    self.option4 = option4
     self.option1Alt = option1Alt
     self.option2Alt = option2Alt
     self.option3Alt = option3Alt
+    self.option4Alt = option4Alt
     self.dynamicOptionsFrame = dynamicOptionsFrame
     self.prevBtn = prevBtn
     self.nextBtn = nextBtn
@@ -684,6 +689,7 @@ function NaowhUIInstaller:GoToStep(step)
         Option1 = self.option1,
         Option2 = self.option2,
         Option3 = self.option3,
+        Option4 = self.option4,
         Next = self.nextBtn,
         Prev = self.prevBtn,
         Skip = self.skipBtn,
@@ -700,12 +706,16 @@ function NaowhUIInstaller:GoToStep(step)
             local result = originalSetup(setupModule, addonName, ...)
             
             if addonName and installerSelf.recentlyInstalled then
-                installerSelf.recentlyInstalled[addonName] = true
-                
-                if addonName == "WeakAuras" then
-                    installerSelf.recentlyInstalled["General WeakAuras"] = true
-                    installerSelf.recentlyInstalled["Class WeakAuras"] = true
+                -- Don't mark WeakAuras as recently installed to prevent green status
+                if addonName ~= "WeakAuras" then
+                    installerSelf.recentlyInstalled[addonName] = true
                 end
+                
+                -- Skip marking WeakAuras steps as recently installed
+                -- if addonName == "WeakAuras" then
+                --     installerSelf.recentlyInstalled["General WeakAuras"] = true
+                --     installerSelf.recentlyInstalled["Class WeakAuras"] = true
+                -- end
                 
                 if installerSelf and installerSelf.RefreshAllStepButtons then
                     installerSelf:RefreshAllStepButtons()
@@ -731,6 +741,7 @@ function NaowhUIInstaller:RepositionOptionButtons()
     if self.option1:IsShown() then table.insert(visibleButtons, self.option1) end
     if self.option2:IsShown() then table.insert(visibleButtons, self.option2) end
     if self.option3:IsShown() then table.insert(visibleButtons, self.option3) end
+    if self.option4:IsShown() then table.insert(visibleButtons, self.option4) end
     
     local buttonCount = #visibleButtons
     if buttonCount == 0 then return end
@@ -767,6 +778,12 @@ function NaowhUIInstaller:RepositionOptionButtons()
             visibleButtons[2]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset + buttonWidth + spacing, -40)
             visibleButtons[3]:SetPoint("TOP", self.desc3, "BOTTOM", startOffset + (buttonWidth + spacing) * 2, -40)
         end
+    elseif buttonCount == 4 then
+        -- Four buttons - stack vertically to ensure they fit
+        visibleButtons[1]:SetPoint("TOP", self.desc3, "BOTTOM", 0, -40)
+        visibleButtons[2]:SetPoint("TOP", visibleButtons[1], "BOTTOM", 0, -10)
+        visibleButtons[3]:SetPoint("TOP", visibleButtons[2], "BOTTOM", 0, -10)
+        visibleButtons[4]:SetPoint("TOP", visibleButtons[3], "BOTTOM", 0, -10)
     end
 end
 
@@ -836,6 +853,8 @@ function NaowhUIInstaller:ClearContent()
     self.option2:SetScript("OnClick", nil)
     self.option3:Hide()
     self.option3:SetScript("OnClick", nil)
+    self.option4:Hide()
+    self.option4:SetScript("OnClick", nil)
     
     -- Hide dynamic options frame and clear any dynamic buttons
     self.dynamicOptionsFrame:Hide()
@@ -1115,8 +1134,8 @@ function NaowhUIInstaller:InstallClassWeakAuras(className)
         C_Timer.After(0.1, function()
             if NUI[className] then
                 SE:Setup("WeakAuras", nil, nil, nil, nil, className)
-                -- Mark Class WeakAuras as recently installed immediately
-                self:MarkAsRecentlyInstalled("Class WeakAuras")
+                -- Don't mark WeakAuras as recently installed to prevent green status
+                -- self:MarkAsRecentlyInstalled("Class WeakAuras")
                 -- Refresh immediately after setup
                 self:RefreshStepButtonStatus("Class WeakAuras")
                 -- Also refresh after a short delay in case the status change is async
